@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import './model/route.model.dart';
 import './fetch_routes.dart';
+
+import './pages/stop_select.dart';
 
 void main() => runApp(MyApp());
 
@@ -23,9 +26,24 @@ class OnBoarding extends StatefulWidget {
   _OnBoarding createState() => _OnBoarding();
 }
 
+class ListItem extends StatelessWidget {
+  final String routeName;
+  ListItem({this.routeName}) : super();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      child: Center(
+        child: Text(routeName),
+      ),
+    );
+  }
+}
+
 class _OnBoarding extends State<OnBoarding> {
   List<SingleRoute> _routes = new List<SingleRoute>();
-  var _selectedRoute;
+  SingleRoute _selectedRoute;
 
   @override
   void initState() {
@@ -38,16 +56,22 @@ class _OnBoarding extends State<OnBoarding> {
     super.initState();
   }
 
-  _handleTap(routeId) {
+  _handleTap(routeId) async {
     getLine(routeId);
-    // setState(() {
-    //   _selectedRoute = getLine(routeId);
-    // });
+    var route = await getLine(routeId);
+    setState(() {
+      _selectedRoute = route;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => StopSelect(route: route)),
+    );
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('None')),
+      appBar: AppBar(title: Text('NAME')),
       body: Center(
         child: ListView.builder(
           padding: const EdgeInsets.all(8),
@@ -57,13 +81,8 @@ class _OnBoarding extends State<OnBoarding> {
               onTap: () {
                 _handleTap(_routes[index].routeId);
               },
-              child: new Container(
-                height: 50,
-                child: Center(
-                  child: Text(
-                    _routes[index].routeName,
-                  ),
-                ),
+              child: ListItem(
+                routeName: _routes[index].routeName,
               ),
             );
           },

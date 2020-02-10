@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-String getUrl(String requestArg) {
+String service(String requestArg) {
   var id = 3001376;
   var key = utf8.encode('a038ac1d-33d2-4dbf-a1a7-8e435a3e06ec');
   var request = utf8.encode("/v3/$requestArg?devid=$id");
