@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
-import './model/route.model.dart';
-import './fetch_routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 
-import './pages/stop_select.dart';
+import 'blocs/blocs.dart';
+import 'repositories/repositories.dart';
+import 'simple_bloc_delegate.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  BlocSupervisor.delegate = SimpleBlocDelegate();
 
-class MyApp extends StatelessWidget {
+  final AllRoutesRepository allRoutesRepository = AllRoutesRepository(
+    routesApiClient: RoutesApiClient(
+      httpClient: http.Client(),
+    ),
+  );
+
+  runApp(App(allRoutesRepository: allRoutesRepository));
+}
+
+class App extends StatelessWidget {
+  final AllRoutesRepository allRoutesRepository;
+
+  App({Key key, @required this.allRoutesRepository})
+      : assert(allRoutesRepository != null),
+        super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,78 +32,48 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: OnBoarding(),
-    );
-  }
-}
-
-class OnBoarding extends StatefulWidget {
-  OnBoarding({Key key}) : super(key: key);
-
-  @override
-  _OnBoarding createState() => _OnBoarding();
-}
-
-class ListItem extends StatelessWidget {
-  final String routeName;
-  ListItem({this.routeName}) : super();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      child: Center(
-        child: Text(routeName),
+      home: BlocProvider<RoutesBloc>(
+        create: (context) =>
+            RoutesBloc(allRoutesRepository: allRoutesRepository),
+        child: OnBoarding(),
       ),
     );
   }
 }
 
-class _OnBoarding extends State<OnBoarding> {
-  List<SingleRoute> _routes = new List<SingleRoute>();
-  SingleRoute _selectedRoute;
-
+class OnBoarding extends StatelessWidget {
   @override
-  void initState() {
-    getAllRoutes().then((value) {
-      print('Initing State...');
-      setState(() {
-        _routes = value;
-      });
-    });
-    super.initState();
-  }
-
-  _handleTap(routeId) async {
-    getLine(routeId);
-    var route = await getLine(routeId);
-    setState(() {
-      _selectedRoute = route;
-    });
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => StopSelect(route: route)),
-    );
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('NAME')),
+      appBar: AppBar(
+        title: Text("Transport App"),
+      ),
       body: Center(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: _routes.length,
-          itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              onTap: () {
-                _handleTap(_routes[index].routeId);
-              },
-              child: ListItem(
-                routeName: _routes[index].routeName,
-              ),
-            );
+        child: BlocListener(
+          bloc: BlocProvider.of<RoutesBloc>(context),
+          listener: (context, state) {
+            print("Inside Listener");
+            if (state is RoutesLoaded) {
+              print("Loaded: ${state.routes}");
+            }
           },
+          child: BlocBuilder<RoutesBloc, RoutesState>(
+            builder: (context, state) {
+              if (state is RoutesLoaded) {
+                return Center(child: Text('Loaded'));
+              }
+              if (state is RoutesEmpty) {
+                return Center(child: Text('No Routes'));
+              }
+              if (state is RoutesLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (state is RoutesError) {
+                return Center(child: Text('Error'));
+              }
+              return Center();
+            },
+          ),
         ),
       ),
     );
