@@ -1,15 +1,50 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 
 import 'package:ptv/repositories/repositories.dart';
 import 'package:ptv/models/models.dart';
-import 'package:ptv/blocs/blocs.dart';
+
+// EVENT
+abstract class RoutesEvent extends Equatable {
+  @override
+  List<Object> get props => [];
+}
+
+class FetchRoutes extends RoutesEvent {}
+
+// =====
+// STATE
+abstract class RoutesState extends Equatable {
+  const RoutesState();
+
+  @override
+  List<Object> get props => [];
+}
+
+class RoutesEmpty extends RoutesState {}
+
+class RoutesLoading extends RoutesState {}
+
+class RoutesLoaded extends RoutesState {
+  final List<SingleRoute> routes;
+
+  const RoutesLoaded({@required this.routes}) : assert(routes != null);
+
+  @override
+  List<Object> get props => [routes];
+}
+
+class RoutesError extends RoutesState {}
+
+// =====
+// BLOC
 
 class RoutesBloc extends Bloc<RoutesEvent, RoutesState> {
-  final AllRoutesRepository allRoutesRepository;
+  final RoutesRepository routesRepository;
 
-  RoutesBloc({@required this.allRoutesRepository})
-      : assert(allRoutesRepository != null);
+  RoutesBloc({@required this.routesRepository})
+      : assert(routesRepository != null);
 
   @override
   RoutesState get initialState => RoutesEmpty();
@@ -18,12 +53,10 @@ class RoutesBloc extends Bloc<RoutesEvent, RoutesState> {
   Stream<RoutesState> mapEventToState(
     RoutesEvent event,
   ) async* {
-    print('routes');
     if (event is FetchRoutes) {
       yield RoutesLoading();
       try {
-        final List<SingleRoute> routes = await allRoutesRepository.getRoutes();
-
+        final List<SingleRoute> routes = await routesRepository.getRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
         yield RoutesError();

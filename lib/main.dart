@@ -9,26 +9,26 @@ import 'simple_bloc_delegate.dart';
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
 
-  final AllRoutesRepository allRoutesRepository = AllRoutesRepository(
+  final RoutesRepository routesRepository = RoutesRepository(
     routesApiClient: RoutesApiClient(
       httpClient: http.Client(),
     ),
   );
 
-  runApp(App(allRoutesRepository: allRoutesRepository));
+  runApp(App(routesRepository: routesRepository));
 }
 
 class App extends StatelessWidget {
-  final AllRoutesRepository allRoutesRepository;
+  final RoutesRepository routesRepository;
 
-  App({Key key, @required this.allRoutesRepository})
-      : assert(allRoutesRepository != null),
+  App({Key key, @required this.routesRepository})
+      : assert(routesRepository != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<RoutesBloc>(
-      create: (context) => RoutesBloc(allRoutesRepository: allRoutesRepository),
+      create: (context) => RoutesBloc(routesRepository: routesRepository),
       child: MaterialApp(home: HomePage()),
     );
   }
@@ -39,17 +39,19 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RoutesBloc routesBloc = BlocProvider.of<RoutesBloc>(context);
     return Container(
       child: Center(
+        // Button to nav to onboarding
         child: RaisedButton(
           onPressed: () async {
+            routesBloc.add(FetchRoutes());
             await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => OnBoarding(),
               ),
             );
-            BlocProvider.of<RoutesBloc>(context).add(FetchRoutes());
           },
           child: Text('Add Route'),
         ),
@@ -61,6 +63,7 @@ class HomePage extends StatelessWidget {
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final StopsBloc stopsBloc = BlocProvider.of<StopsBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Transport App"),
@@ -69,11 +72,21 @@ class OnBoarding extends StatelessWidget {
         child: BlocBuilder<RoutesBloc, RoutesState>(
           builder: (context, state) {
             if (state is RoutesLoaded) {
-              return ListView.builder(
+              final _trainRoutes =
+                  state.routes.where((i) => i.routeType == 0).toList();
+
+              return ListView.separated(
+                itemCount: _trainRoutes.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(),
                 itemBuilder: (BuildContext context, int index) {
-                  if (state.routes[index].routeType == 0) {
-                    return Text(state.routes[index].routeName);
-                  }
+                  return GestureDetector(
+                      child: Text(_trainRoutes[index].routeName),
+                      onTap: () => print(_trainRoutes[index].routeId)
+                      // onTap: () => stopsBloc
+                      //     .add(fetchStopsOnRoute(_trainRoutes[index].routeId)),
+
+                      );
                 },
               );
             }
@@ -93,30 +106,3 @@ class OnBoarding extends StatelessWidget {
     );
   }
 }
-
-// child: BlocListener(
-//   bloc: BlocProvider.of<RoutesBloc>(context),
-//   listener: (context, state) {
-//     print("Inside Listener");
-//     if (state is RoutesLoaded) {
-//       print("Loaded: ${state.routes}");
-//     }
-//   },
-//   child: BlocBuilder<RoutesBloc, RoutesState>(
-//     builder: (context, state) {
-//       if (state is RoutesLoaded) {
-//         return Center(child: Text('Loaded'));
-//       }
-//       if (state is RoutesEmpty) {
-//         return Center(child: Text('No Routes'));
-//       }
-//       if (state is RoutesLoading) {
-//         return Center(child: CircularProgressIndicator());
-//       }
-//       if (state is RoutesError) {
-//         return Center(child: Text('Error'));
-//       }
-//       return Center();
-//     },
-//   ),
-// ),

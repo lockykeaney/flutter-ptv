@@ -34,4 +34,16 @@ class RoutesApiClient {
     final result = json.decode(response.body);
     return SingleRoute.fromJson(result);
   }
+
+  Future<List<Stop>> fetchStopsOnRoute(int routeId) async {
+    print('Fetching all routes...');
+    final url = service('stops/route/$routeId/route_type/0');
+    final response = await this.httpClient.get(url);
+    if (response.statusCode != 200) {
+      throw Exception('error getting weather for location');
+    }
+    final result = json.decode(response.body);
+    Iterable list = result["stops"];
+    return list.map((route) => Stop.fromJson(route)).toList();
+  }
 }
