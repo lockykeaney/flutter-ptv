@@ -27,15 +27,32 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: BlocProvider<RoutesBloc>(
-        create: (context) =>
-            RoutesBloc(allRoutesRepository: allRoutesRepository),
-        child: OnBoarding(),
+    return BlocProvider<RoutesBloc>(
+      create: (context) => RoutesBloc(allRoutesRepository: allRoutesRepository),
+      child: MaterialApp(home: HomePage()),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: RaisedButton(
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OnBoarding(),
+              ),
+            );
+            BlocProvider.of<RoutesBloc>(context).add(FetchRoutes());
+          },
+          child: Text('Add Route'),
+        ),
       ),
     );
   }
@@ -49,33 +66,57 @@ class OnBoarding extends StatelessWidget {
         title: Text("Transport App"),
       ),
       body: Center(
-        child: BlocListener(
-          bloc: BlocProvider.of<RoutesBloc>(context),
-          listener: (context, state) {
-            print("Inside Listener");
+        child: BlocBuilder<RoutesBloc, RoutesState>(
+          builder: (context, state) {
             if (state is RoutesLoaded) {
-              print("Loaded: ${state.routes}");
+              return ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+                  if (state.routes[index].routeType == 0) {
+                    return Text(state.routes[index].routeName);
+                  }
+                },
+              );
             }
+            if (state is RoutesEmpty) {
+              return Center(child: Text('No Routes'));
+            }
+            if (state is RoutesLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (state is RoutesError) {
+              return Center(child: Text('Error'));
+            }
+            return Center();
           },
-          child: BlocBuilder<RoutesBloc, RoutesState>(
-            builder: (context, state) {
-              if (state is RoutesLoaded) {
-                return Center(child: Text('Loaded'));
-              }
-              if (state is RoutesEmpty) {
-                return Center(child: Text('No Routes'));
-              }
-              if (state is RoutesLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (state is RoutesError) {
-                return Center(child: Text('Error'));
-              }
-              return Center();
-            },
-          ),
         ),
       ),
     );
   }
 }
+
+// child: BlocListener(
+//   bloc: BlocProvider.of<RoutesBloc>(context),
+//   listener: (context, state) {
+//     print("Inside Listener");
+//     if (state is RoutesLoaded) {
+//       print("Loaded: ${state.routes}");
+//     }
+//   },
+//   child: BlocBuilder<RoutesBloc, RoutesState>(
+//     builder: (context, state) {
+//       if (state is RoutesLoaded) {
+//         return Center(child: Text('Loaded'));
+//       }
+//       if (state is RoutesEmpty) {
+//         return Center(child: Text('No Routes'));
+//       }
+//       if (state is RoutesLoading) {
+//         return Center(child: CircularProgressIndicator());
+//       }
+//       if (state is RoutesError) {
+//         return Center(child: Text('Error'));
+//       }
+//       return Center();
+//     },
+//   ),
+// ),
