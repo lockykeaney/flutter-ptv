@@ -85,7 +85,7 @@ class OnBoarding extends StatelessWidget {
                       child: Text(_trainRoutes[index].routeName),
                       // onTap: () => print(_trainRoutes[index].routeId)
                       onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                          .add(fetchStopsOnRoute(_trainRoutes[index].routeId)),
+                          .add(FetchStops(_trainRoutes[index].routeId)),
                       );
                 },
               );
