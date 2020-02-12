@@ -1,17 +1,17 @@
 import 'package:equatable/equatable.dart';
 
-class SingleRoute extends Equatable {
+class Route extends Equatable {
   final int routeId;
   final int routeType;
   final String routeName;
 
-  const SingleRoute({this.routeId, this.routeName, this.routeType});
+  const Route({this.routeId, this.routeName, this.routeType});
 
   @override
   List<Object> get props => [routeId, routeName, routeType];
 
-  static SingleRoute fromJson(dynamic json) {
-    return SingleRoute(
+  static Route fromJson(dynamic json) {
+    return Route(
       routeId: json['route_id'],
       routeType: json['route_type'],
       routeName: json['route_name'],

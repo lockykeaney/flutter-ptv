@@ -4,31 +4,31 @@ import 'package:http/http.dart' as http;
 
 import 'blocs/blocs.dart';
 import 'repositories/repositories.dart';
-import 'simple_bloc_delegate.dart';
+import 'core/simple_bloc_delegate.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
 
-  final RoutesRepository routesRepository = RoutesRepository(
+  final PtvRepository ptvRepository = PtvRepository(
     routesApiClient: RoutesApiClient(
       httpClient: http.Client(),
     ),
   );
 
-  runApp(App(routesRepository: routesRepository));
+  runApp(App(ptvRepository: ptvRepository));
 }
 
 class App extends StatelessWidget {
-  final RoutesRepository routesRepository;
+  final PtvRepository ptvRepository;
 
-  App({Key key, @required this.routesRepository})
-      : assert(routesRepository != null),
+  App({Key key, @required this.ptvRepository})
+      : assert(ptvRepository != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<RoutesBloc>(
-      create: (context) => RoutesBloc(routesRepository: routesRepository),
+    return BlocProvider<OnboardingBloc>(
+      create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
       child: MaterialApp(home: HomePage()),
     );
   }
@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
         // Button to nav to onboarding
         child: RaisedButton(
           onPressed: () async {
-            BlocProvider.of<RoutesBloc>(context).add(FetchRoutes());
+            BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
             await Navigator.push(
               context,
               MaterialPageRoute(
@@ -62,14 +62,16 @@ class HomePage extends StatelessWidget {
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // final StopsBloc stopsBloc = BlocProvider.of<StopsBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Transport App"),
       ),
       body: Center(
-        child: BlocBuilder<RoutesBloc, RoutesState>(
+        child: BlocBuilder<OnboardingBloc, OnboardingState>(
           builder: (context, state) {
+            if (state is OnboardingLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
             if (state is RoutesLoaded) {
               final _trainRoutes =
                   state.routes.where((i) => i.routeType == 0).toList();
@@ -81,9 +83,9 @@ class OnBoarding extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                       child: Text(_trainRoutes[index].routeName),
-                      onTap: () => print(_trainRoutes[index].routeId)
-                      // onTap: () => BlocProvider.of<StopsBloc>(context)
-                      //     .add(fetchStopsOnRoute(_trainRoutes[index].routeId)),
+                      // onTap: () => print(_trainRoutes[index].routeId)
+                      onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                          .add(fetchStopsOnRoute(_trainRoutes[index].routeId)),
                       );
                 },
               );
@@ -91,13 +93,9 @@ class OnBoarding extends StatelessWidget {
             if (state is RoutesEmpty) {
               return Center(child: Text('No Routes'));
             }
-            if (state is RoutesLoading) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (state is RoutesError) {
+            if (state is OnboardingError) {
               return Center(child: Text('Error'));
             }
-            return Center();
           },
         ),
       ),

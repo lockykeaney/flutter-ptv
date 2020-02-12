@@ -27,7 +27,7 @@ class RoutesEmpty extends RoutesState {}
 class RoutesLoading extends RoutesState {}
 
 class RoutesLoaded extends RoutesState {
-  final List<SingleRoute> routes;
+  final List<Route> routes;
 
   const RoutesLoaded({@required this.routes}) : assert(routes != null);
 
@@ -56,7 +56,7 @@ class RoutesBloc extends Bloc<RoutesEvent, RoutesState> {
     if (event is FetchRoutes) {
       yield RoutesLoading();
       try {
-        final List<SingleRoute> routes = await routesRepository.getRoutes();
+        final List<Route> routes = await routesRepository.getRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
         yield RoutesError();
