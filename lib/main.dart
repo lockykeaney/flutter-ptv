@@ -39,13 +39,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RoutesBloc routesBloc = BlocProvider.of<RoutesBloc>(context);
     return Container(
       child: Center(
         // Button to nav to onboarding
         child: RaisedButton(
           onPressed: () async {
-            routesBloc.add(FetchRoutes());
+            BlocProvider.of<RoutesBloc>(context).add(FetchRoutes());
             await Navigator.push(
               context,
               MaterialPageRoute(
@@ -63,7 +62,7 @@ class HomePage extends StatelessWidget {
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final StopsBloc stopsBloc = BlocProvider.of<StopsBloc>(context);
+    // final StopsBloc stopsBloc = BlocProvider.of<StopsBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Transport App"),
@@ -83,9 +82,8 @@ class OnBoarding extends StatelessWidget {
                   return GestureDetector(
                       child: Text(_trainRoutes[index].routeName),
                       onTap: () => print(_trainRoutes[index].routeId)
-                      // onTap: () => stopsBloc
+                      // onTap: () => BlocProvider.of<StopsBloc>(context)
                       //     .add(fetchStopsOnRoute(_trainRoutes[index].routeId)),
-
                       );
                 },
               );
