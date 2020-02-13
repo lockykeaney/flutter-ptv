@@ -23,7 +23,7 @@ class Stop extends Equatable {
         stopId: json['stop_id'],
         routeType: json['route_type'],
         stopName: json['stop_name'],
-        stopSuburb: json['stop_suburb'],
-        disruptionIds: json['disruption_ids']);
+        stopSuburb: json['stop_suburb']
+        );
   }
 }
