@@ -1,11 +1,12 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 
 import 'package:ptv/repositories/repositories.dart';
 import 'package:ptv/models/models.dart';
 
-import 'onboarding_event.dart';
-import 'onboarding_state.dart';
+part 'onboarding_event.dart';
+part 'onboarding_state.dart';
 
 class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   final PtvRepository ptvRepository;

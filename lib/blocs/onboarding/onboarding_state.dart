@@ -1,6 +1,4 @@
-import 'package:meta/meta.dart';
-import 'package:equatable/equatable.dart';
-import 'package:ptv/models/models.dart';
+part of 'onboarding_bloc.dart';
 
 // Onboarding Parent State
 abstract class OnboardingState extends Equatable {
@@ -11,7 +9,9 @@ abstract class OnboardingState extends Equatable {
 }
 
 class OnboardingInitial extends OnboardingState {}
+
 class OnboardingLoading extends OnboardingState {}
+
 class OnboardingError extends OnboardingState {}
 
 // Routes State
@@ -37,5 +37,3 @@ class StopsLoaded extends OnboardingState {
   @override
   List<Object> get props => [stops];
 }
-
-

@@ -1,5 +1,4 @@
-import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+part of 'onboarding_bloc.dart';
 
 @immutable
 abstract class OnboardingEvent extends Equatable {
