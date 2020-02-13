@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/onboarding/onboarding_bloc.dart';
-import '../blocs/onboarding/onboarding_state.dart';
-import '../blocs/onboarding/onboarding_event.dart';
 
 class OnBoarding extends StatelessWidget {
   @override
