@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'blocs/blocs.dart';
+
+import '../blocs/onboarding/onboarding_bloc.dart';
+import '../blocs/onboarding/onboarding_state.dart';
+import '../blocs/onboarding/onboarding_event.dart';
 
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Transport App"),
+        title: Text("Train Routes"),
       ),
       body: Center(
         child: BlocBuilder<OnboardingBloc, OnboardingState>(
@@ -26,9 +29,9 @@ class OnBoarding extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                       child: Text(_trainRoutes[index].routeName),
-                      // onTap: () => print(_trainRoutes[index].routeId)
-                      onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                          .add(FetchStops(_trainRoutes[index].routeId)),
+                      onTap: () => print(_trainRoutes[index].routeId)
+                      // onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                      //     .add(FetchStops(_trainRoutes[index].routeId)),
                       );
                 },
               );
@@ -39,6 +42,7 @@ class OnBoarding extends StatelessWidget {
             if (state is OnboardingError) {
               return Center(child: Text('Error'));
             }
+            return Container();
           },
         ),
       ),

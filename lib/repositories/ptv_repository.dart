@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
-import 'package:ptv/repositories/routes_api_client.dart';
+import 'package:ptv/repositories/ptv_api_client.dart';
 import 'package:ptv/models/models.dart';
 
 class PtvRepository {

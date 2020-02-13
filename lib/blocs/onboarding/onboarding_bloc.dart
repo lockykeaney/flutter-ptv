@@ -8,10 +8,10 @@ import 'onboarding_event.dart';
 import 'onboarding_state.dart';
 
 class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
-  final RoutesRepository routesRepository;
+  final PtvRepository ptvRepository;
 
-  OnboardingBloc({@required this.routesRepository})
-      : assert(routesRepository != null);
+  OnboardingBloc({@required this.ptvRepository})
+      : assert(ptvRepository != null);
 
   @override
   OnboardingState get initialState => OnboardingInitial();
@@ -23,7 +23,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (event is FetchRoutes) {
       yield OnboardingLoading();
       try {
-        final List<Route> routes = await routesRepository.fetchRoutes();
+        final List<Route> routes = await ptvRepository.fetchRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
         yield OnboardingError();
@@ -32,7 +32,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (event is FetchStops) {
       yield OnboardingLoading();
       try {
-        final List<Stop> stops = await routesRepository.fetchStopsOnRoute(event.routeId);
+        final List<Stop> stops = await ptvRepository.fetchStopsOnRoute(event.routeId);
         yield StopsLoaded(stops: stops);
       } catch (_) {
         yield OnboardingError();

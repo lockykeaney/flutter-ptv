@@ -5,12 +5,13 @@ import 'package:http/http.dart' as http;
 import 'blocs/blocs.dart';
 import 'repositories/repositories.dart';
 import 'core/simple_bloc_delegate.dart';
+import 'pages/onboarding.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
 
   final PtvRepository ptvRepository = PtvRepository(
-    routesApiClient: RoutesApiClient(
+    ptvApiClient: PtvApiClient(
       httpClient: http.Client(),
     ),
   );
