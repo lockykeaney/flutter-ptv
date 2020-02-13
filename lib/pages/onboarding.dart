@@ -27,9 +27,9 @@ class OnBoarding extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                       child: Text(_trainRoutes[index].routeName),
-                      onTap: () => print(_trainRoutes[index].routeId)
-                      // onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                      //     .add(FetchStops(_trainRoutes[index].routeId)),
+                      // onTap: () => print(_trainRoutes[index].routeId)
+                      onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                          .add(FetchStops(routeId: _trainRoutes[index].routeId)),
                       );
                 },
               );

@@ -31,9 +31,14 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       }
     }
     if (event is FetchStops) {
+      print(event.routeId);
+      final List<Stop> stops = await ptvRepository.fetchStopsOnRoute(event.routeId);
+        print(stops);
       yield OnboardingLoading();
       try {
+        
         final List<Stop> stops = await ptvRepository.fetchStopsOnRoute(event.routeId);
+        print(stops);
         yield StopsLoaded(stops: stops);
       } catch (_) {
         yield OnboardingError();
