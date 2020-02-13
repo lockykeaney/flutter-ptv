@@ -11,7 +11,7 @@ class PtvRepository {
   PtvRepository({@required this.ptvApiClient})
       : assert(ptvApiClient != null);
 
-  Future<List<Route>> getRoutes() async {
+  Future<List<Route>> fetchRoutes() async {
     return await ptvApiClient.fetchAllRoutes();
   }
 

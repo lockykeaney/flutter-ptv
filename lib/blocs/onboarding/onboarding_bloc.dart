@@ -23,10 +23,19 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (event is FetchRoutes) {
       yield OnboardingLoading();
       try {
-        final List<Route> routes = await routesRepository.getRoutes();
+        final List<Route> routes = await routesRepository.fetchRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
-        yield RoutesError();
+        yield OnboardingError();
+      }
+    }
+    if (event is FetchStops) {
+      yield OnboardingLoading();
+      try {
+        final List<Stop> stops = await routesRepository.fetchStopsOnRoute(event.routeId);
+        yield StopsLoaded(stops: stops);
+      } catch (_) {
+        yield OnboardingError();
       }
     }
   }
