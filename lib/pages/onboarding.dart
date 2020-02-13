@@ -34,6 +34,22 @@ class OnBoarding extends StatelessWidget {
                 },
               );
             }
+            if (state is StopsLoaded) {
+              // final _routeStops =
+              //     state.st.where((i) => i.routeType == 0).toList();
+
+              return ListView.separated(
+                itemCount: state.stops.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(),
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                      child: Text(state.stops[index].stopName),
+                      onTap: () => print(state.stops[index].stopId)
+                      );
+                },
+              );
+            }
             if (state is RoutesEmpty) {
               return Center(child: Text('No Routes'));
             }
