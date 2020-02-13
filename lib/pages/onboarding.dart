@@ -3,6 +3,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/onboarding/onboarding_bloc.dart';
 
+class OnboardingList extends StatelessWidget {
+  const OnboardingList({Key key, this.list, this.listKey}) : super(key: key);
+
+  final List list;
+  final String listKey;
+  // final onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    print(listKey);
+    return ListView.separated(
+      itemCount: list.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+          child: Text(list[index].routeName),
+          // onTap: () => BlocProvider.of<OnboardingBloc>(context)
+          //     .add(FetchStops(routeId: _trainRoutes[index].routeId)),
+        );
+      },
+    );
+  }
+}
+
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -26,33 +50,38 @@ class OnBoarding extends StatelessWidget {
                     Divider(),
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-                      child: Text(_trainRoutes[index].routeName),
-                      // onTap: () => print(_trainRoutes[index].routeId)
-                      onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                          .add(FetchStops(routeId: _trainRoutes[index].routeId)),
-                      );
-                },
-              );
-            }
-            if (state is StopsLoaded) {
-              // final _routeStops =
-              //     state.st.where((i) => i.routeType == 0).toList();
-
-              return ListView.separated(
-                itemCount: state.stops.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(),
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                      child: Text(state.stops[index].stopName),
-                      onTap: () => print(state.stops[index].stopId)
-                      );
+                    child: Text(_trainRoutes[index].routeName),
+                    onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                        .add(FetchStops(routeId: _trainRoutes[index].routeId)),
+                  );
                 },
               );
             }
             if (state is RoutesEmpty) {
               return Center(child: Text('No Routes'));
             }
+
+            if (state is StopsLoaded) {
+              return ListView.separated(
+                itemCount: state.stops.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(),
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    child: Text(state.stops[index].stopName),
+                    onTap: () => BlocProvider.of<OnboardingBloc>(context).add(
+                      FetchDepartures(
+                          routeId: state.stops[index].routeId,
+                          stopId: state.stops[index].stopId),
+                    ),
+                  );
+                },
+              );
+            }
+            if (state is StopsEmpty) {
+              return Center(child: Text('No Stops'));
+            }
+
             if (state is OnboardingError) {
               return Center(child: Text('Error'));
             }

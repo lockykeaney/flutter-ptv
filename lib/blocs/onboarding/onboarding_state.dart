@@ -37,3 +37,16 @@ class StopsLoaded extends OnboardingState {
   @override
   List<Object> get props => [stops];
 }
+
+// Departures State
+class DeparturesEmpty extends OnboardingState {}
+
+class DeparturesLoaded extends OnboardingState {
+  final List<Departure> departures;
+
+  const DeparturesLoaded({@required this.departures})
+      : assert(departures != null);
+
+  @override
+  List<Object> get props => [departures];
+}

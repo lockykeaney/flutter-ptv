@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class Stop extends Equatable {
   final int stopId;
+  final int routeId;
   final int routeType;
   final String stopName;
   final String stopSuburb;
@@ -9,6 +10,7 @@ class Stop extends Equatable {
 
   const Stop(
       {this.stopId,
+      this.routeId,
       this.stopName,
       this.routeType,
       this.stopSuburb,
@@ -16,14 +18,14 @@ class Stop extends Equatable {
 
   @override
   List<Object> get props =>
-      [stopId, stopName, routeType, stopSuburb, disruptionIds];
+      [stopId, routeId, stopName, routeType, stopSuburb, disruptionIds];
 
   static Stop fromJson(dynamic json) {
     return Stop(
         stopId: json['stop_id'],
+        routeId: json['route_id'],
         routeType: json['route_type'],
         stopName: json['stop_name'],
-        stopSuburb: json['stop_suburb']
-        );
+        stopSuburb: json['stop_suburb']);
   }
 }

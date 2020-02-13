@@ -21,6 +21,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   Stream<OnboardingState> mapEventToState(
     OnboardingEvent event,
   ) async* {
+    print(state);
     if (event is FetchRoutes) {
       yield OnboardingLoading();
       try {
@@ -31,15 +32,23 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       }
     }
     if (event is FetchStops) {
-      print(event.routeId);
-      final List<Stop> stops = await ptvRepository.fetchStopsOnRoute(event.routeId);
-        print(stops);
       yield OnboardingLoading();
       try {
-        
-        final List<Stop> stops = await ptvRepository.fetchStopsOnRoute(event.routeId);
-        print(stops);
+        print(event.routeId);
+        final List<Stop> stops =
+            await ptvRepository.fetchStopsOnRoute(event.routeId);
         yield StopsLoaded(stops: stops);
+      } catch (_) {
+        yield OnboardingError();
+      }
+    }
+    if (event is FetchDepartures) {
+      yield OnboardingLoading();
+      try {
+        final List<Departure> departures = await ptvRepository
+            .fetchDeparaturesFromStop(event.routeId, event.stopId);
+        print(departures);
+        yield DeparturesLoaded(departures: departures);
       } catch (_) {
         yield OnboardingError();
       }
