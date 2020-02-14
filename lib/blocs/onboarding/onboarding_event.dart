@@ -5,35 +5,25 @@ abstract class OnboardingEvent extends Equatable {
   const OnboardingEvent();
 }
 
-class FetchRoutes extends OnboardingEvent {
+class OnboardingStepOne extends OnboardingEvent {
   List<Object> get props => [];
 }
 
-// class SaveRouteId extends OnboardingEvent {
-//   final int routeId;
+class OnboardingStepTwo extends OnboardingEvent {
+  final Route route;
 
-//   const SaveRouteId({@required this.routeId}) : assert(routeId != null);
-
-//   @override
-//   print(routeId);
-// }
-
-class FetchStops extends OnboardingEvent {
-  final int routeId;
-
-  const FetchStops({@required this.routeId}) : assert(routeId != null);
+  const OnboardingStepTwo({@required this.route}) : assert(route != null);
 
   @override
-  List<Object> get props => [routeId];
+  List<Object> get props => [route];
 }
 
-class FetchDepartures extends OnboardingEvent {
-  final int routeId;
-  final int stopId;
+class OnboardingStepThree extends OnboardingEvent {
+  final int direction;
 
-  const FetchDepartures({@required this.routeId, @required this.stopId})
-      : assert(routeId != null, stopId != null);
+  const OnboardingStepThree({@required this.direction})
+      : assert(direction != null);
 
   @override
-  List<Object> get props => [routeId, stopId];
+  List<Object> get props => [direction];
 }

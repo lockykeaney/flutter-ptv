@@ -22,7 +22,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingEvent event,
   ) async* {
     print(state);
-    if (event is FetchRoutes) {
+
+    if (event is OnboardingStepOne) {
       yield OnboardingLoading();
       try {
         final List<Route> routes = await ptvRepository.fetchRoutes();
@@ -31,27 +32,26 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         yield OnboardingError();
       }
     }
-    if (event is FetchStops) {
-      yield OnboardingLoading();
+    if (event is OnboardingStepTwo) {
+      Journey(routeId: event.route.routeId, routeName: event.route.routeName);
       try {
-        print(event.routeId);
+        // print(event.route.routeId);
         final List<Stop> stops =
-            await ptvRepository.fetchStopsOnRoute(event.routeId);
+            await ptvRepository.fetchStopsOnRoute(event.route.routeId);
         yield StopsLoaded(stops: stops);
       } catch (_) {
         yield OnboardingError();
       }
     }
-    if (event is FetchDepartures) {
-      yield OnboardingLoading();
-      try {
-        final List<Departure> departures = await ptvRepository
-            .fetchDeparaturesFromStop(event.routeId, event.stopId);
-        print(departures);
-        yield DeparturesLoaded(departures: departures);
-      } catch (_) {
-        yield OnboardingError();
-      }
-    }
+    // if (event is FetchDepartures) {
+    //   yield OnboardingLoading();
+    //   try {
+    //     final List<Departure> departures =
+    //         await ptvRepository.fetchDeparaturesFromStop();
+    //     yield DeparturesLoaded(departures: departures);
+    //   } catch (_) {
+    //     yield OnboardingError();
+    //   }
+    // }
   }
 }

@@ -47,16 +47,16 @@ class PtvApiClient {
     return list.map((route) => Stop.fromJson(route)).toList();
   }
 
-  Future<List<Departure>> fetchDeparaturesFromStop(
-      int routeId, int stopId) async {
-    final url = service('departures/route_type/0/stop/$stopId/route/$routeId');
+  Future<List<Departure>> fetchDeparaturesFromStop() async {
+        final url = service('departures/route_type/0/stop/1053/route/8');
+    // final url = service('departures/route_type/0/stop/$stopId/route/$routeId');
     final response = await this.httpClient.get(url);
     if (response.statusCode != 200) {
       throw Exception('error getting weather for location');
     }
     final result = json.decode(response.body);
     Iterable list = result["departures"];
-    print(list);
+    // print(list);
     return list.map((route) => Departure.fromJson(route)).toList();
   }
 }

@@ -22,8 +22,7 @@ class PtvRepository {
     return await ptvApiClient.fetchStopsOnRoute(routeId);
   }
 
-  Future<List<Departure>> fetchDeparaturesFromStop(
-      int routeId, int stopId) async {
-    return await ptvApiClient.fetchDeparaturesFromStop(routeId, stopId);
+  Future<List<Departure>> fetchDeparaturesFromStop() async {
+    return await ptvApiClient.fetchDeparaturesFromStop();
   }
 }
