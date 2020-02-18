@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'blocs/blocs.dart';
 import 'repositories/repositories.dart';
 import 'core/simple_bloc_delegate.dart';
-import 'pages/homepage.dart';
+import 'screens/screens.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
@@ -30,7 +30,11 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<HomepageBloc>(
       create: (context) => HomepageBloc(ptvRepository: ptvRepository),
-      child: MaterialApp(home: HomePage()),
+      child: MaterialApp(
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: HomePage()),
     );
   }
 }

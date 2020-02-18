@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 
-import '../blocs/onboarding/onboarding_bloc.dart';
+import '../blocs/blocs.dart';
+import '../repositories/repositories.dart';
 
 class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final PtvRepository ptvRepository = PtvRepository(
+      ptvApiClient: PtvApiClient(
+        httpClient: http.Client(),
+      ),
+    );
+
+    return BlocProvider<OnboardingBloc>(
+      create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
+      child: OnboardingInner(),
+    );
+  }
+}
+
+class OnboardingInner extends StatelessWidget {
+  const OnboardingInner({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    BlocProvider.of<OnboardingBloc>(context).add(OnboardingStepOne());
     return Scaffold(
       appBar: AppBar(
         title: Text("Train Routes"),
@@ -14,9 +37,6 @@ class OnBoarding extends StatelessWidget {
         child: BlocListener<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
             print('== LISTENER ==');
-            if (state is StopsLoaded) {
-              print('== STOPS LOADED ==');
-            }
           },
           child: BlocBuilder<OnboardingBloc, OnboardingState>(
             builder: (context, state) {
@@ -64,30 +84,6 @@ class OnBoarding extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class OnboardingList extends StatelessWidget {
-  const OnboardingList({Key key, this.list, this.listKey}) : super(key: key);
-
-  final List<Object> list;
-  final String listKey;
-  // final onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    print(listKey);
-    return ListView.separated(
-      itemCount: list.length,
-      separatorBuilder: (BuildContext context, int index) => Divider(),
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          child: Text(list[index]),
-          // onTap: () => BlocProvider.of<OnboardingBloc>(context)
-          //     .add(FetchStops(routeId: _trainRoutes[index].routeId)),
-        );
-      },
     );
   }
 }
