@@ -27,6 +27,7 @@ class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
       try {
         final List<Departure> departures =
             await ptvRepository.fetchDeparaturesFromStop();
+        print(departures);
         yield DeparturesLoaded(departures: departures);
       } catch (_) {
         yield HomepageError();

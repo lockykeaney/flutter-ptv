@@ -28,8 +28,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<OnboardingBloc>(
-      create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
+    return BlocProvider<HomepageBloc>(
+      create: (context) => HomepageBloc(ptvRepository: ptvRepository),
       child: MaterialApp(home: HomePage()),
     );
   }
