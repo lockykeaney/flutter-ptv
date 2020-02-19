@@ -22,18 +22,23 @@ class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
     HomepageEvent event,
   ) async* {
     if (event is DefaultJourney) {
-      final JourneyModel journey = JourneyModel(
-          id: '1',
-          defaultJourney: true,
-          routeId: 8,
-          routeName: 'Hurstbridge',
-          stopId: 1053,
-          stopName: 'Dennis',
-          direction: 1,
-          journeyName: 'To Work');
-      final List<DepartureModel> departures = await ptvRepository
-          .fetchDeparaturesFromStop(journey.routeId, journey.stopId);
-      yield DefaultJourneyLoaded(journey: journey, departures: departures);
+      yield HomepageLoading();
+      try {
+        final JourneyModel journey = JourneyModel(
+            id: '1',
+            defaultJourney: true,
+            routeId: 8,
+            routeName: 'Hurstbridge',
+            stopId: 1053,
+            stopName: 'Dennis',
+            direction: 1,
+            journeyName: 'To Work');
+        final List<DepartureModel> departures = await ptvRepository
+            .fetchDeparaturesFromStop(journey.routeId, journey.stopId);
+        yield DefaultJourneyLoaded(journey: journey, departures: departures);
+      } catch (_) {
+        yield HomepageError();
+      }
     }
   }
 }

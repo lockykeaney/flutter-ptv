@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptv/models/models.dart';
+import 'package:intl/intl.dart';
 
 import '../blocs/blocs.dart';
 
@@ -8,11 +10,17 @@ import 'screens.dart';
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
 
+  String directionOfJourney(direction) {
+    switch (direction) {
+      case 1:
+        return 'Towards City';
+      case 2:
+        return 'Away From City';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var thisInstant = new DateTime.now();
-
-    // BlocProvider.of<HomepageBloc>(context).add(FetchDepartures());
     BlocProvider.of<HomepageBloc>(context).add(DefaultJourney());
     return Scaffold(
       appBar: AppBar(
@@ -36,15 +44,7 @@ class HomePage extends StatelessWidget {
           child: BlocListener<HomepageBloc, HomepageState>(
             listener: (context, state) {
               if (state is DefaultJourneyLoaded) {
-                final _upcoming = state.departures
-                    .where((i) => DateTime.parse(i.scheduledDeparture)
-                        .isAfter(thisInstant))
-                    .toList();
-                Duration difference =
-                    DateTime.parse(_upcoming[0].scheduledDeparture)
-                        .difference(thisInstant);
-                print('differene in minutes: ');
-                print(difference.inMinutes);
+                print(state.journey);
               }
             },
             child: BlocBuilder<HomepageBloc, HomepageState>(
@@ -56,22 +56,12 @@ class HomePage extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       Text(state.journey.journeyName),
-                      Text(state.departures[0].scheduledDeparture)
+                      DepartureTime(
+                        departures: state.departures,
+                      ),
+                      Text('${state.journey.stopName}'),
+                      Text(directionOfJourney(state.journey.direction))
                     ],
-                  );
-                }
-
-                if (state is DeparturesLoaded) {
-                  // final _departures = state.departures.where((i) => i <= 5).toList();
-                  return ListView.separated(
-                    itemCount: state.departures.length,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        Divider(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Center(
-                        child: Text(state.departures[index].scheduledDeparture),
-                      );
-                    },
                   );
                 }
                 return Container();
@@ -79,6 +69,65 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class DepartureTime extends StatefulWidget {
+  final List<DepartureModel> departures;
+
+  const DepartureTime({Key key, @required this.departures}) : super(key: key);
+
+  @override
+  _DepartureTimeState createState() => _DepartureTimeState();
+}
+
+class _DepartureTimeState extends State<DepartureTime> {
+  String nextTrain;
+  List<String> trainsAfter;
+  final thisInstant = new DateTime.now();
+
+  String timeUntilNextTrain(departure) {
+    Duration difference =
+        DateTime.parse(departure).toLocal().difference(thisInstant);
+    return difference.inMinutes.toString();
+  }
+
+  String parseToTime(date) {
+    return DateFormat('h:mm').format(date);
+  }
+
+  @override
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    final _upcoming = widget.departures
+        .where((i) => DateTime.parse(i.scheduledDeparture).isAfter(thisInstant))
+        .toList();
+    setState(() {
+      nextTrain = _upcoming[0].scheduledDeparture;
+      trainsAfter = [
+        _upcoming[1].scheduledDeparture,
+        _upcoming[2].scheduledDeparture
+      ];
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: <Widget>[
+          Text('${timeUntilNextTrain(nextTrain)} minutes'),
+          Text('${parseToTime(DateTime.parse(nextTrain).toLocal())}'),
+          Row(
+            children: <Widget>[
+              Text('+${timeUntilNextTrain(trainsAfter[0])} mins'),
+              Text('+${timeUntilNextTrain(trainsAfter[1])} mins'),
+            ],
+          )
+        ],
       ),
     );
   }
