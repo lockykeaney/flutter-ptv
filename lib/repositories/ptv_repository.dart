@@ -10,19 +10,20 @@ class PtvRepository {
 
   PtvRepository({@required this.ptvApiClient}) : assert(ptvApiClient != null);
 
-  Future<List<Route>> fetchRoutes() async {
+  Future<List<RouteModel>> fetchRoutes() async {
     return await ptvApiClient.fetchAllRoutes();
   }
 
-  Future<Route> fetchRoute(int routeId) async {
+  Future<RouteModel> fetchRoute(int routeId) async {
     return await ptvApiClient.fetchRoute(routeId);
   }
 
-  Future<List<Stop>> fetchStopsOnRoute(int routeId) async {
+  Future<List<StopModel>> fetchStopsOnRoute(int routeId) async {
     return await ptvApiClient.fetchStopsOnRoute(routeId);
   }
 
-  Future<List<Departure>> fetchDeparaturesFromStop() async {
-    return await ptvApiClient.fetchDeparaturesFromStop();
+  Future<List<DepartureModel>> fetchDeparaturesFromStop(
+      int routeId, int stopId) async {
+    return await ptvApiClient.fetchDeparaturesFromStop(routeId, stopId);
   }
 }

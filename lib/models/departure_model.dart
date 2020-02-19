@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Departure extends Equatable {
+class DepartureModel extends Equatable {
   final int stopId;
   final int routeId;
   final int directionId;
@@ -8,7 +8,7 @@ class Departure extends Equatable {
   final String scheduledDeparture;
   final String estimatedDeparture;
 
-  const Departure(
+  const DepartureModel(
       {this.stopId,
       this.routeId,
       this.directionId,
@@ -19,8 +19,8 @@ class Departure extends Equatable {
   @override
   List<Object> get props => [];
 
-  static Departure fromJson(dynamic json) {
-    return Departure(
+  static DepartureModel fromJson(dynamic json) {
+    return DepartureModel(
       stopId: json['stop_id'],
       routeId: json['route_id'],
       directionId: json['direction_id'],

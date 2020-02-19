@@ -10,7 +10,7 @@ class OnboardingStepOne extends OnboardingEvent {
 }
 
 class OnboardingStepTwo extends OnboardingEvent {
-  final Route route;
+  final RouteModel route;
 
   const OnboardingStepTwo({@required this.route}) : assert(route != null);
 
@@ -19,11 +19,15 @@ class OnboardingStepTwo extends OnboardingEvent {
 }
 
 class OnboardingStepThree extends OnboardingEvent {
-  final int direction;
+  final StopModel stop;
 
-  const OnboardingStepThree({@required this.direction})
-      : assert(direction != null);
+  const OnboardingStepThree({@required this.stop}) : assert(stop != null);
 
   @override
-  List<Object> get props => [direction];
+  List<Object> get props => [stop];
+}
+
+class OnboardingConfirmation extends OnboardingEvent {
+  @override
+  List<Object> get props => [];
 }

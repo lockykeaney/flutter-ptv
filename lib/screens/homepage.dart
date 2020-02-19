@@ -12,7 +12,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var thisInstant = new DateTime.now();
 
-    BlocProvider.of<HomepageBloc>(context).add(FetchDepartures());
+    // BlocProvider.of<HomepageBloc>(context).add(FetchDepartures());
+    BlocProvider.of<HomepageBloc>(context).add(DefaultJourney());
     return Scaffold(
       appBar: AppBar(
         title: Text('Homepage'),
@@ -23,7 +24,7 @@ class HomePage extends StatelessWidget {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => OnBoarding(),
+                  builder: (context) => OnBoardingProvider(),
                 ),
               );
             },
@@ -35,16 +36,20 @@ class HomePage extends StatelessWidget {
           child: BlocListener<HomepageBloc, HomepageState>(
             listener: (context, state) {
               print('== LISTENER ==');
-              print('now: $thisInstant');
-              if (state is FetchDepartures) {
-                print('== STOPS LOADED ==');
-              }
+              // print('now: $thisInstant');
+              print(state);
             },
             child: BlocBuilder<HomepageBloc, HomepageState>(
               builder: (context, state) {
                 if (state is HomepageLoading) {
                   return Center(child: CircularProgressIndicator());
                 }
+                if (state is DefaultJourneyLoaded) {
+                  return Center(
+                    child: Text(state.journey.journeyName),
+                  );
+                }
+
                 if (state is DeparturesLoaded) {
                   // final _departures = state.departures.where((i) => i <= 5).toList();
                   return ListView.separated(
@@ -52,11 +57,9 @@ class HomePage extends StatelessWidget {
                     separatorBuilder: (BuildContext context, int index) =>
                         Divider(),
                     itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                          child:
-                              Text(state.departures[index].scheduledDeparture),
-                          onTap: () => print(
-                              state.departures[index].scheduledDeparture));
+                      return Center(
+                        child: Text(state.departures[index].scheduledDeparture),
+                      );
                     },
                   );
                 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:ptv/models/route_model.dart';
+import 'package:ptv/models/stop_model.dart';
 
 import '../blocs/blocs.dart';
 import '../repositories/repositories.dart';
 
-class OnBoarding extends StatelessWidget {
+class OnBoardingProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PtvRepository ptvRepository = PtvRepository(
@@ -16,13 +18,13 @@ class OnBoarding extends StatelessWidget {
 
     return BlocProvider<OnboardingBloc>(
       create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
-      child: OnboardingInner(),
+      child: Onboarding(),
     );
   }
 }
 
-class OnboardingInner extends StatelessWidget {
-  const OnboardingInner({
+class Onboarding extends StatelessWidget {
+  const Onboarding({
     Key key,
   }) : super(key: key);
 
@@ -43,36 +45,46 @@ class OnboardingInner extends StatelessWidget {
               if (state is OnboardingLoading) {
                 return Center(child: CircularProgressIndicator());
               }
+
               if (state is RoutesLoaded) {
                 final _trainRoutes =
                     state.routes.where((i) => i.routeType == 0).toList();
-
-                return ListView.separated(
-                  itemCount: _trainRoutes.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      Divider(),
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                        child: Text(_trainRoutes[index].routeName),
-                        onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                            .add(OnboardingStepTwo(route: _trainRoutes[index]))
-                        // .add(SaveRouteId(routeId: _trainRoutes[index].routeId))
-                        );
-                  },
-                );
+                return RoutesList(trainRoutes: _trainRoutes);
               }
 
               if (state is StopsLoaded) {
-                return ListView.separated(
-                  itemCount: state.stops.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      Divider(),
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                        child: Text(state.stops[index].stopName),
-                        onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                            .add(OnboardingStepThree(direction: 1)));
-                  },
+                final _routeStops = state.stops;
+                return StopsList(routeStops: _routeStops);
+              }
+
+              if (state is DirectionSelect) {
+                return Center(
+                  child: Column(
+                    children: <Widget>[
+                      RaisedButton(
+                        child: Text('Towards City'),
+                        // onPressed: () {
+                        //   BlocProvider.of<OnboardingBloc>(context).add(
+                        //     OnboardingStepThree(direction: 1),
+                        //   );
+                        // },
+                      ),
+                      RaisedButton(
+                        child: Text('Away From City'),
+                        // onPressed: () {
+                        //   BlocProvider.of<OnboardingBloc>(context).add(
+                        //     OnboardingStepThree(direction: 2),
+                        //   );
+                        // },
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is OnboardingConfirmation) {
+                return Center(
+                  child: Text('Confirm'),
                 );
               }
 
@@ -84,6 +96,56 @@ class OnboardingInner extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class StopsList extends StatelessWidget {
+  const StopsList({
+    Key key,
+    @required List<StopModel> routeStops,
+  })  : _routeStops = routeStops,
+        super(key: key);
+
+  final List<StopModel> _routeStops;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: _routeStops.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+            child: Text(_routeStops[index].stopName),
+            onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                .add(OnboardingStepThree(stop: _routeStops[index])));
+      },
+    );
+  }
+}
+
+class RoutesList extends StatelessWidget {
+  const RoutesList({
+    Key key,
+    @required List<RouteModel> trainRoutes,
+  })  : _trainRoutes = trainRoutes,
+        super(key: key);
+
+  final List<RouteModel> _trainRoutes;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: _trainRoutes.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+            child: Text(_trainRoutes[index].routeName),
+            onTap: () => BlocProvider.of<OnboardingBloc>(context)
+                .add(OnboardingStepTwo(route: _trainRoutes[index]))
+            // .add(SaveRouteId(routeId: _trainRoutes[index].routeId))
+            );
+      },
     );
   }
 }

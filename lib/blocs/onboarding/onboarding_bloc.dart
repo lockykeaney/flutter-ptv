@@ -26,18 +26,32 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (event is OnboardingStepOne) {
       yield OnboardingLoading();
       try {
-        final List<Route> routes = await ptvRepository.fetchRoutes();
+        final List<RouteModel> routes = await ptvRepository.fetchRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
         yield OnboardingError();
       }
     }
     if (event is OnboardingStepTwo) {
-      Journey(routeId: event.route.routeId, routeName: event.route.routeName);
+      // Journey(routeId: event.route.routeId, routeName: event.route.routeName);
       try {
-        final List<Stop> stops =
+        final List<StopModel> stops =
             await ptvRepository.fetchStopsOnRoute(event.route.routeId);
         yield StopsLoaded(stops: stops);
+      } catch (_) {
+        yield OnboardingError();
+      }
+    }
+    if (event is OnboardingStepThree) {
+      try {
+        yield DirectionSelect();
+      } catch (_) {
+        yield OnboardingError();
+      }
+    }
+    if (event is OnboardingConfirmation) {
+      try {
+        yield DirectionSelect();
       } catch (_) {
         yield OnboardingError();
       }
