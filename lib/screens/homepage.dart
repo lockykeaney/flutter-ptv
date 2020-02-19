@@ -35,9 +35,17 @@ class HomePage extends StatelessWidget {
         child: Center(
           child: BlocListener<HomepageBloc, HomepageState>(
             listener: (context, state) {
-              print('== LISTENER ==');
-              // print('now: $thisInstant');
-              print(state);
+              if (state is DefaultJourneyLoaded) {
+                final _upcoming = state.departures
+                    .where((i) => DateTime.parse(i.scheduledDeparture)
+                        .isAfter(thisInstant))
+                    .toList();
+                Duration difference =
+                    DateTime.parse(_upcoming[0].scheduledDeparture)
+                        .difference(thisInstant);
+                print('differene in minutes: ');
+                print(difference.inMinutes);
+              }
             },
             child: BlocBuilder<HomepageBloc, HomepageState>(
               builder: (context, state) {
@@ -45,8 +53,11 @@ class HomePage extends StatelessWidget {
                   return Center(child: CircularProgressIndicator());
                 }
                 if (state is DefaultJourneyLoaded) {
-                  return Center(
-                    child: Text(state.journey.journeyName),
+                  return Column(
+                    children: <Widget>[
+                      Text(state.journey.journeyName),
+                      Text(state.departures[0].scheduledDeparture)
+                    ],
                   );
                 }
 
