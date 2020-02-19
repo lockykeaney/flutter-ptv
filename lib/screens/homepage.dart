@@ -55,7 +55,10 @@ class HomePage extends StatelessWidget {
                 if (state is DefaultJourneyLoaded) {
                   return Column(
                     children: <Widget>[
-                      Text(state.journey.journeyName),
+                      Text(
+                        state.journey.journeyName,
+                        style: TextStyle(fontSize: 40.0),
+                      ),
                       DepartureTime(
                         departures: state.departures,
                       ),
@@ -119,9 +122,17 @@ class _DepartureTimeState extends State<DepartureTime> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
-          Text('${timeUntilNextTrain(nextTrain)} minutes'),
-          Text('${parseToTime(DateTime.parse(nextTrain).toLocal())}'),
+          Text(
+            '${timeUntilNextTrain(nextTrain)}',
+            style: TextStyle(fontSize: 128.0),
+          ),
+          Text('MINUTES'),
+          Text(
+            '${parseToTime(DateTime.parse(nextTrain).toLocal())}',
+            style: TextStyle(fontSize: 32.0),
+          ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('+${timeUntilNextTrain(trainsAfter[0])} mins'),
               Text('+${timeUntilNextTrain(trainsAfter[1])} mins'),
