@@ -14,7 +14,6 @@ class PtvApiClient {
 
   //fetch all routes
   Future<List<RouteModel>> fetchAllRoutes() async {
-    print('Fetching all routes...');
     final url = service('routes');
     final response = await this.httpClient.get(url);
     if (response.statusCode != 200) {
@@ -47,7 +46,6 @@ class PtvApiClient {
   }
 
   Future<List<StopModel>> fetchStopsOnRoute(int routeId) async {
-    print('Fetching all stops on a route...');
     final url = service('stops/route/$routeId/route_type/0');
     final response = await this.httpClient.get(url);
     if (response.statusCode != 200) {
@@ -60,7 +58,6 @@ class PtvApiClient {
 
   Future<List<DepartureModel>> fetchDeparaturesFromStop(
       int routeId, int stopId) async {
-    // final url = service('departures/route_type/0/stop/1053/route/8');
     final url = service('departures/route_type/0/stop/$stopId/route/$routeId');
     final response = await this.httpClient.get(url);
     if (response.statusCode != 200) {
@@ -68,7 +65,6 @@ class PtvApiClient {
     }
     final result = json.decode(response.body);
     Iterable list = result["departures"];
-    // print(list);
     return list.map((route) => DepartureModel.fromJson(route)).toList();
   }
 }

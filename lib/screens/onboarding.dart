@@ -38,7 +38,10 @@ class Onboarding extends StatelessWidget {
       body: Container(
         child: BlocListener<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
-            print('== LISTENER ==');
+            if (state is OnboardingState) {
+              print('Onboarding State');
+              print(state);
+            }
           },
           child: BlocBuilder<OnboardingBloc, OnboardingState>(
             builder: (context, state) {
