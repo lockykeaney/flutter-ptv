@@ -18,6 +18,10 @@ class PtvRepository {
     return await ptvApiClient.fetchRoute(routeId);
   }
 
+  Future<RouteStatusModel> fetchRouteStatus(int routeId) async {
+    return await ptvApiClient.fetchRouteStatus(routeId);
+  }
+
   Future<List<StopModel>> fetchStopsOnRoute(int routeId) async {
     return await ptvApiClient.fetchStopsOnRoute(routeId);
   }

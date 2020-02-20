@@ -35,7 +35,11 @@ class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
             journeyName: 'To Work');
         final List<DepartureModel> departures = await ptvRepository
             .fetchDeparaturesFromStop(journey.routeId, journey.stopId);
-        yield DefaultJourneyLoaded(journey: journey, departures: departures);
+        final RouteStatusModel status =
+            await ptvRepository.fetchRouteStatus(journey.routeId);
+        print(status);
+        yield DefaultJourneyLoaded(
+            journey: journey, departures: departures, status: status);
       } catch (_) {
         yield HomepageError();
       }

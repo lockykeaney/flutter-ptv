@@ -54,16 +54,18 @@ class HomePage extends StatelessWidget {
                 }
                 if (state is DefaultJourneyLoaded) {
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
                         state.journey.journeyName,
                         style: TextStyle(fontSize: 40.0),
                       ),
+                      Text(state.status.description),
                       DepartureTime(
                         departures: state.departures,
                       ),
                       Text('${state.journey.stopName}'),
-                      Text(directionOfJourney(state.journey.direction))
+                      Text(directionOfJourney(state.journey.direction)),
                     ],
                   );
                 }

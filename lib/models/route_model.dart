@@ -18,3 +18,20 @@ class RouteModel extends Equatable {
     );
   }
 }
+
+class RouteStatusModel extends Equatable {
+  final String description;
+  final String timestamp;
+
+  const RouteStatusModel({this.description, this.timestamp});
+
+  @override
+  List<Object> get props => [description, timestamp];
+
+  static RouteStatusModel fromJson(dynamic json) {
+    return RouteStatusModel(
+      description: json['description'],
+      timestamp: json['timestamp'],
+    );
+  }
+}

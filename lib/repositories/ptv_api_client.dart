@@ -36,6 +36,16 @@ class PtvApiClient {
     return RouteModel.fromJson(result);
   }
 
+  Future<RouteStatusModel> fetchRouteStatus(int routeId) async {
+    final url = service('routes/$routeId');
+    final response = await this.httpClient.get(url);
+    if (response.statusCode != 200) {
+      throw Exception('error getting weather for location');
+    }
+    final result = json.decode(response.body);
+    return RouteStatusModel.fromJson(result['route']['route_service_status']);
+  }
+
   Future<List<StopModel>> fetchStopsOnRoute(int routeId) async {
     print('Fetching all stops on a route...');
     final url = service('stops/route/$routeId/route_type/0');
