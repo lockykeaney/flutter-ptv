@@ -21,6 +21,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   Stream<OnboardingState> mapEventToState(
     OnboardingEvent event,
   ) async* {
+    print(state);
+
     if (event is OnboardingStepOne) {
       yield OnboardingLoading();
       try {
@@ -31,6 +33,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       }
     }
     if (event is OnboardingStepTwo) {
+      // Journey(routeId: event.route.routeId, routeName: event.route.routeName);
       try {
         final List<StopModel> stops =
             await ptvRepository.fetchStopsOnRoute(event.route.routeId);
