@@ -14,11 +14,11 @@ class OnboardingLoading extends OnboardingState {}
 
 class OnboardingError extends OnboardingState {}
 
-// Routes State
-class RoutesEmpty extends OnboardingState {}
+// Main Class
 
+// Routes State
 class RoutesLoaded extends OnboardingState {
-  final List<Route> routes;
+  final List<RouteModel> routes;
 
   const RoutesLoaded({@required this.routes}) : assert(routes != null);
 
@@ -27,13 +27,16 @@ class RoutesLoaded extends OnboardingState {
 }
 
 // Stops State
-class StopsEmpty extends OnboardingState {}
-
 class StopsLoaded extends OnboardingState {
-  final List<Stop> stops;
+  final List<StopModel> stops;
 
   const StopsLoaded({@required this.stops}) : assert(stops != null);
 
   @override
   List<Object> get props => [stops];
+}
+
+class DirectionSelect extends OnboardingState {
+  @override
+  List<Object> get props => [];
 }
