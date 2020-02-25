@@ -16,6 +16,8 @@ class JourneysLoaded extends JourneysState {
   List<Object> get props => [journeys];
 }
 
+class NewJourneyAdded extends JourneysState {}
+
 class JourneysInitial extends JourneysState {}
 
 class JourneysLoading extends JourneysState {}
