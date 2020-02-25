@@ -67,6 +67,17 @@ class _OnboardingScreenOneState extends State<OnboardingScreenOne> {
               itemCount: _trainRoutes.length,
               separatorBuilder: (BuildContext context, int index) => Divider(),
               itemBuilder: (BuildContext context, int index) {
+                if (_route != null) {
+                  if (_route.routeId == _trainRoutes[index].routeId) {
+                    return GestureDetector(
+                      child: Text(
+                        _trainRoutes[index].routeName,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      onTap: () => selectRoutes(_trainRoutes[index]),
+                    );
+                  }
+                }
                 return GestureDetector(
                   child: Text(_trainRoutes[index].routeName),
                   onTap: () => selectRoutes(_trainRoutes[index]),
