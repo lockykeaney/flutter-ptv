@@ -18,11 +18,74 @@ class OnBoardingProvider extends StatelessWidget {
 
     return BlocProvider<OnboardingBloc>(
       create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
-      child: Onboarding(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Train Routes"),
+        ),
+        body: SafeArea(child: OnboardingScreenOne()),
+      ),
     );
   }
 }
 
+// TRYING WITH A STATEFUL WIDGET ======================================
+class OnboardingScreenOne extends StatefulWidget {
+  const OnboardingScreenOne({Key key}) : super(key: key);
+
+  @override
+  _OnboardingScreenOneState createState() => _OnboardingScreenOneState();
+}
+
+class _OnboardingScreenOneState extends State<OnboardingScreenOne> {
+  RouteModel _route;
+
+  void selectRoutes(route) {
+    setState(() {
+      _route = route;
+    });
+    print(_route.routeId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
+  }
+
+  Widget build(BuildContext context) {
+    return Center(
+      child: BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          if (state is OnboardingLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (state is RoutesLoaded) {
+            final _trainRoutes =
+                state.routes.where((i) => i.routeType == 0).toList();
+            return ListView.separated(
+              itemCount: _trainRoutes.length,
+              separatorBuilder: (BuildContext context, int index) => Divider(),
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  child: Text(_trainRoutes[index].routeName),
+                  onTap: () => selectRoutes(_trainRoutes[index]),
+                );
+              },
+            );
+          }
+
+          if (state is OnboardingError) {
+            return Center(child: Text('Error'));
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+}
+
+// TRYING WITH A STATELESS WIDGET ======================================
 class Onboarding extends StatelessWidget {
   const Onboarding({
     Key key,
@@ -30,19 +93,14 @@ class Onboarding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<OnboardingBloc>(context).add(OnboardingStepOne());
+    BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
     return Scaffold(
       appBar: AppBar(
         title: Text("Train Routes"),
       ),
       body: Container(
         child: BlocListener<OnboardingBloc, OnboardingState>(
-          listener: (context, state) {
-            if (state is OnboardingState) {
-              print('Onboarding State');
-              print(state);
-            }
-          },
+          listener: (context, state) {},
           child: BlocBuilder<OnboardingBloc, OnboardingState>(
             builder: (context, state) {
               if (state is OnboardingLoading) {
@@ -66,19 +124,9 @@ class Onboarding extends StatelessWidget {
                     children: <Widget>[
                       RaisedButton(
                         child: Text('Towards City'),
-                        // onPressed: () {
-                        //   BlocProvider.of<OnboardingBloc>(context).add(
-                        //     OnboardingStepThree(direction: 1),
-                        //   );
-                        // },
                       ),
                       RaisedButton(
                         child: Text('Away From City'),
-                        // onPressed: () {
-                        //   BlocProvider.of<OnboardingBloc>(context).add(
-                        //     OnboardingStepThree(direction: 2),
-                        //   );
-                        // },
                       ),
                     ],
                   ),
@@ -145,9 +193,7 @@ class RoutesList extends StatelessWidget {
         return GestureDetector(
             child: Text(_trainRoutes[index].routeName),
             onTap: () => BlocProvider.of<OnboardingBloc>(context)
-                .add(OnboardingStepTwo(route: _trainRoutes[index]))
-            // .add(SaveRouteId(routeId: _trainRoutes[index].routeId))
-            );
+                .add(FetchStops(routeId: _trainRoutes[index].routeId)));
       },
     );
   }

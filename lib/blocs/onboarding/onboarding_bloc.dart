@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ptv/blocs/blocs.dart';
 
 import 'package:ptv/repositories/repositories.dart';
 import 'package:ptv/models/models.dart';
@@ -21,7 +22,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   Stream<OnboardingState> mapEventToState(
     OnboardingEvent event,
   ) async* {
-    if (event is OnboardingStepOne) {
+    if (event is FetchRoutes) {
       yield OnboardingLoading();
       try {
         final List<RouteModel> routes = await ptvRepository.fetchRoutes();
@@ -30,10 +31,13 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         yield OnboardingError();
       }
     }
-    if (event is OnboardingStepTwo) {
+    if (event is AddRouteInformation) {
+      // Update the Main state of Journey
+    }
+    if (event is FetchStops) {
       try {
         final List<StopModel> stops =
-            await ptvRepository.fetchStopsOnRoute(event.route.routeId);
+            await ptvRepository.fetchStopsOnRoute(event.routeId);
         yield StopsLoaded(stops: stops);
       } catch (_) {
         yield OnboardingError();
