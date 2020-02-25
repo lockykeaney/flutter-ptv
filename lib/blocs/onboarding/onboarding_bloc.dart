@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ptv/blocs/blocs.dart';
 
 import 'package:ptv/repositories/repositories.dart';
 import 'package:ptv/models/models.dart';
@@ -33,6 +32,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     }
     if (event is AddRouteInformation) {
       // Update the Main state of Journey
+      print(event.route.routeName);
+      yield Journey(route: event.route);
     }
     if (event is FetchStops) {
       try {
