@@ -8,6 +8,15 @@ abstract class HomepageState extends Equatable {
   List<Object> get props => [];
 }
 
+class AllJourneysLoaded extends HomepageState {
+  final List<JourneyModel> journeys;
+
+  const AllJourneysLoaded({@required this.journeys}) : assert(journeys != null);
+
+  @override
+  List<Object> get props => [journeys];
+}
+
 class DefaultJourneyLoaded extends HomepageState {
   final JourneyModel journey;
   final List<DepartureModel> departures;
