@@ -12,27 +12,37 @@ void main() {
 
   final JourneyRepository journeyRepository = JourneyRepository();
 
-  runApp(App(journeyRepository: journeyRepository));
+  final PtvRepository ptvRepository = PtvRepository(
+    ptvApiClient: PtvApiClient(
+      httpClient: http.Client(),
+    ),
+  );
+
+  runApp(
+    App(
+      journeyRepository: journeyRepository,
+      ptvRepository: ptvRepository,
+    ),
+  );
 }
 
 class App extends StatelessWidget {
   final JourneyRepository journeyRepository;
+  final PtvRepository ptvRepository;
 
-  App({Key key, @required this.journeyRepository})
+  App({Key key, @required this.journeyRepository, @required this.ptvRepository})
       : assert(journeyRepository != null),
+        assert(ptvRepository != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomepageBloc>(
-          create: (context) =>
-              HomepageBloc(journeyRepository: journeyRepository),
-        ),
         BlocProvider<JourneyBloc>(
-          create: (context) =>
-              JourneyBloc(journeyRepository: journeyRepository),
+          create: (context) => JourneyBloc(
+              journeyRepository: journeyRepository,
+              ptvRepository: ptvRepository),
         )
       ],
       child: MaterialApp(
@@ -43,7 +53,7 @@ class App extends StatelessWidget {
                   displayColor: Colors.white,
                 ),
           ),
-          home: HomePage()),
+          home: Journeys()),
     );
   }
 }
