@@ -37,23 +37,33 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var routes = <String, WidgetBuilder>{
+      Onboarding.routeName: (BuildContext context) => new Onboarding(),
+    };
     return MultiBlocProvider(
       providers: [
         BlocProvider<JourneyBloc>(
           create: (context) => JourneyBloc(
               journeyRepository: journeyRepository,
               ptvRepository: ptvRepository),
+        ),
+        BlocProvider<OnboardingBloc>(
+          create: (context) => OnboardingBloc(
+              journeyRepository: journeyRepository,
+              ptvRepository: ptvRepository),
         )
       ],
       child: MaterialApp(
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            textTheme: Theme.of(context).textTheme.apply(
-                  bodyColor: Colors.white,
-                  displayColor: Colors.white,
-                ),
-          ),
-          home: Journeys()),
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          textTheme: Theme.of(context).textTheme.apply(
+                bodyColor: Colors.white,
+                displayColor: Colors.white,
+              ),
+        ),
+        home: Journeys(),
+        routes: routes,
+      ),
     );
   }
 }

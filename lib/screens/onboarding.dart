@@ -7,25 +7,27 @@ import 'package:ptv/models/stop_model.dart';
 import '../blocs/blocs.dart';
 import '../repositories/repositories.dart';
 
-class OnBoardingProvider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final PtvRepository ptvRepository = PtvRepository(
-      ptvApiClient: PtvApiClient(
-        httpClient: http.Client(),
-      ),
-    );
+// class OnBoardingProvider extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     final PtvRepository ptvRepository = PtvRepository(
+//       ptvApiClient: PtvApiClient(
+//         httpClient: http.Client(),
+//       ),
+//     );
 
-    return BlocProvider<OnboardingBloc>(
-      create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
-      child: Onboarding(),
-    );
-  }
-}
+//     return BlocProvider<OnboardingBloc>(
+//       create: (context) => OnboardingBloc(ptvRepository: ptvRepository),
+//       child: Onboarding(),
+//     );
+//   }
+// }
 
 // TRYING WITH A STATEFUL WIDGET ======================================
 class Onboarding extends StatefulWidget {
   const Onboarding({Key key}) : super(key: key);
+
+  static const String routeName = '/Onboarding';
 
   @override
   _OnboardingState createState() => _OnboardingState();
@@ -34,6 +36,9 @@ class Onboarding extends StatefulWidget {
 class _OnboardingState extends State<Onboarding> {
   RouteModel _route;
   StopModel _stop;
+  List<RouteModel> _filteredRoutes = new List();
+
+  final routesTextController = TextEditingController();
 
   void _nextPage() async {
     BlocProvider.of<OnboardingBloc>(context)
@@ -52,158 +57,137 @@ class _OnboardingState extends State<Onboarding> {
     });
   }
 
+  void setInitialRoutes(routes) {
+    setState(() {
+      _filteredRoutes = routes;
+    });
+  }
+
+  _filterRoutes() {
+    print(
+      _filteredRoutes
+          .where((i) => i.routeName.contains(routesTextController.text))
+          .toList(),
+    );
+    setState(() {
+      _filteredRoutes = _filteredRoutes
+          .where((i) => i.routeName.contains(routesTextController.text))
+          .toList();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    routesTextController.addListener(_filterRoutes);
     BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
+  }
+
+  @override
+  void dispose() {
+    routesTextController.dispose();
+    super.dispose();
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Routes'),
-      ),
+      backgroundColor: Colors.grey,
       floatingActionButton: FloatingActionButton(
         onPressed: _nextPage,
         tooltip: 'Increment',
         child: Icon(Icons.arrow_forward),
       ),
-      body: Center(
-        child: BlocBuilder<OnboardingBloc, OnboardingState>(
-          builder: (context, state) {
-            if (state is OnboardingLoading) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            if (state is RoutesLoaded) {
-              final _trainRoutes =
-                  state.routes.where((i) => i.routeType == 0).toList();
-              return ListView.separated(
-                itemCount: _trainRoutes.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(),
-                itemBuilder: (BuildContext context, int index) {
-                  if (_route != null) {
-                    if (_route.routeId == _trainRoutes[index].routeId) {
-                      return GestureDetector(
-                        child: Text(
-                          _trainRoutes[index].routeName,
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        onTap: () => selectRoute(_trainRoutes[index]),
-                      );
-                    }
-                  }
-                  return GestureDetector(
-                    child: Text(_trainRoutes[index].routeName),
-                    onTap: () => selectRoute(_trainRoutes[index]),
-                  );
+      body: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                color: Colors.black,
+                iconSize: 50.0,
+                icon: Icon(Icons.chevron_left),
+                onPressed: () {
+                  Navigator.pop(context);
                 },
-              );
-            }
+              ),
+            ],
+          ),
+          Expanded(
+            child: BlocBuilder<OnboardingBloc, OnboardingState>(
+              builder: (context, state) {
+                if (state is OnboardingLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-            if (state is StopsLoaded) {
-              final _routeStops = state.stops;
-              return ListView.separated(
-                itemCount: _routeStops.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(),
-                itemBuilder: (BuildContext context, int index) {
-                  if (_stop != null) {
-                    if (_stop.stopId == _routeStops[index].stopId) {
+                if (state is RoutesLoaded) {
+                  final _trainRoutes =
+                      state.routes.where((i) => i.routeType == 0).toList();
+                  setInitialRoutes(_trainRoutes);
+                  return Column(
+                    children: <Widget>[
+                      TextField(
+                        controller: routesTextController,
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10.0),
+                            border: InputBorder.none,
+                            hintText: 'Enter a search term'),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _filteredRoutes.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Text(
+                              _filteredRoutes[index].routeName,
+                              style: TextStyle(color: Colors.red),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                if (state is StopsLoaded) {
+                  final _routeStops = state.stops;
+                  return ListView.separated(
+                    itemCount: _routeStops.length,
+                    separatorBuilder: (BuildContext context, int index) =>
+                        Divider(),
+                    itemBuilder: (BuildContext context, int index) {
+                      if (_stop != null) {
+                        if (_stop.stopId == _routeStops[index].stopId) {
+                          return GestureDetector(
+                            child: Text(
+                              _routeStops[index].stopName,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            onTap: () => selectStop(_routeStops[index]),
+                          );
+                        }
+                      }
                       return GestureDetector(
                         child: Text(
                           _routeStops[index].stopName,
-                          style: TextStyle(color: Colors.red),
+                          style: TextStyle(color: Colors.black),
                         ),
                         onTap: () => selectStop(_routeStops[index]),
                       );
-                    }
-                  }
-                  return GestureDetector(
-                    child: Text(_routeStops[index].stopName),
-                    onTap: () => selectStop(_routeStops[index]),
+                    },
                   );
-                },
-              );
-            }
+                }
 
-            if (state is OnboardingError) {
-              return Center(child: Text('Error'));
-            }
-            return Container();
-          },
-        ),
+                if (state is OnboardingError) {
+                  return Center(child: Text('Error'));
+                }
+                return Container();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-
-// // TRYING WITH A STATELESS WIDGET ======================================
-// class Onboarding extends StatelessWidget {
-//   const Onboarding({
-//     Key key,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Train Routes"),
-//       ),
-//       body: Container(
-//         child: BlocListener<OnboardingBloc, OnboardingState>(
-//           listener: (context, state) {},
-//           child: BlocBuilder<OnboardingBloc, OnboardingState>(
-//             builder: (context, state) {
-//               if (state is OnboardingLoading) {
-//                 return Center(child: CircularProgressIndicator());
-//               }
-
-//               if (state is RoutesLoaded) {
-//                 final _trainRoutes =
-//                     state.routes.where((i) => i.routeType == 0).toList();
-//                 return RoutesList(trainRoutes: _trainRoutes);
-//               }
-
-//               if (state is StopsLoaded) {
-//                 final _routeStops = state.stops;
-//                 return StopsList(routeStops: _routeStops);
-//               }
-
-//               if (state is DirectionSelect) {
-//                 return Center(
-//                   child: Column(
-//                     children: <Widget>[
-//                       RaisedButton(
-//                         child: Text('Towards City'),
-//                       ),
-//                       RaisedButton(
-//                         child: Text('Away From City'),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               }
-
-//               if (state is OnboardingConfirmation) {
-//                 return Center(
-//                   child: Text('Confirm'),
-//                 );
-//               }
-
-//               if (state is OnboardingError) {
-//                 return Center(child: Text('Error'));
-//               }
-//               return Container();
-//             },
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class StopsList extends StatelessWidget {
   const StopsList({
