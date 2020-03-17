@@ -15,6 +15,14 @@ class OnboardingLoading extends OnboardingState {}
 class OnboardingError extends OnboardingState {}
 
 // Main Class
+class Journey extends OnboardingState {
+  final RouteModel route;
+
+  const Journey({@required this.route}) : assert(route != null);
+
+  @override
+  List<Object> get props => [route];
+}
 
 // Routes State
 class RoutesLoaded extends OnboardingState {

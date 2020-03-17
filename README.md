@@ -1,3 +1,5 @@
+#008CCE
+
 I am trying to make an app that consumes my cities public transport data to practice my Flutter development. It requires a signature that is a HMAC-SHA1 hash of the completed request.
 
 The entire explanation from the documentation is:
