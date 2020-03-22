@@ -48,96 +48,94 @@ class _JourneysState extends State<Journeys> with TickerProviderStateMixin {
     BlocProvider.of<JourneyBloc>(context).add(FetchJourneys());
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  IconButton(
-                    color: Colors.white,
-                    iconSize: 50.0,
-                    icon: Icon(Icons.add),
-                    // onPressed: () {
-                    //   print('TAP');
-                    // },
-                    onPressed: () {
-                      Navigator.pushNamed(context, Onboarding.routeName);
-                    },
-                  ),
-                  IconButton(
-                    color: Colors.white,
-                    iconSize: 50.0,
-                    icon: Icon(Icons.warning),
-                    onPressed: () {
-                      print('TAP');
-                    },
-                  ),
-                ],
-              ),
-              Expanded(
-                child: BlocBuilder<JourneyBloc, JourneyState>(
-                  builder: (context, state) {
-                    if (state is JourneysLoading) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      ));
-                    }
-                    if (state is JourneysLoadedWithDepartures) {
-                      return PageView.builder(
-                        itemCount: state.completeRequests.length,
-                        itemBuilder: (context, index) {
-                          final obj = state.completeRequests[index];
-                          return Container(
-                            color: colors[index],
-                            padding: EdgeInsets.all(12.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text(
-                                      obj.journey.journeyName,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 32.0,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${obj.journey.stopName}',
-                                      style: TextStyle(
-                                        fontSize: 28.0,
-                                      ),
-                                    ),
-                                    Text(
-                                      directionOfJourney(obj.journey.direction),
-                                      style: TextStyle(
-                                        fontSize: 28.0,
-                                      ),
-                                    ),
-                                    DepartureTime(
-                                      departures: obj.departures,
-                                    ),
-                                    Text(obj.status.description),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }
-                    return Container();
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                IconButton(
+                  color: Colors.white,
+                  iconSize: 50.0,
+                  icon: Icon(Icons.add),
+                  // onPressed: () {
+                  //   print('TAP');
+                  // },
+                  onPressed: () {
+                    Navigator.pushNamed(context, Onboarding.routeName);
                   },
                 ),
+                IconButton(
+                  color: Colors.white,
+                  iconSize: 50.0,
+                  icon: Icon(Icons.warning),
+                  onPressed: () {
+                    print('TAP');
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: BlocBuilder<JourneyBloc, JourneyState>(
+                builder: (context, state) {
+                  if (state is JourneysLoading) {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                    ));
+                  }
+                  if (state is JourneysLoadedWithDepartures) {
+                    return PageView.builder(
+                      itemCount: state.completeRequests.length,
+                      itemBuilder: (context, index) {
+                        final obj = state.completeRequests[index];
+                        return Container(
+                          color: colors[index],
+                          padding: EdgeInsets.all(12.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(
+                                    obj.journey.journeyName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 32.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${obj.journey.stopName}',
+                                    style: TextStyle(
+                                      fontSize: 28.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    directionOfJourney(obj.journey.direction),
+                                    style: TextStyle(
+                                      fontSize: 28.0,
+                                    ),
+                                  ),
+                                  DepartureTime(
+                                    departures: obj.departures,
+                                  ),
+                                  Text(obj.status.description),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return Container();
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

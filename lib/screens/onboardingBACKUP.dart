@@ -18,15 +18,17 @@ class Onboarding extends StatefulWidget {
 class _OnboardingState extends State<Onboarding> {
   RouteModel _route;
   StopModel _stop;
-  int _direction = 1;
+  String _searchValue = "";
   bool disabledButton = true;
+
+  final onboardingTextController = TextEditingController();
 
   void _nextPage() async {
     if (_route != null) {
       BlocProvider.of<OnboardingBloc>(context)
           .add(FetchStops(routeId: _route.routeId));
+      onboardingTextController.clear();
     }
-    if (_route != null && _stop != null) {}
   }
 
   _selectRoute(route) {
@@ -41,13 +43,10 @@ class _OnboardingState extends State<Onboarding> {
     });
   }
 
-  String directionOfJourney(direction) {
-    switch (direction) {
-      case 1:
-        return 'Towards City';
-      case 2:
-        return 'Away From City';
-    }
+  _setSearchValue() {
+    setState(() {
+      _searchValue = onboardingTextController.text;
+    });
   }
 
   _displayJourneyInformation() {
@@ -63,11 +62,13 @@ class _OnboardingState extends State<Onboarding> {
   @override
   void initState() {
     super.initState();
+    onboardingTextController.addListener(_setSearchValue);
     BlocProvider.of<OnboardingBloc>(context).add(FetchRoutes());
   }
 
   @override
   void dispose() {
+    onboardingTextController.dispose();
     super.dispose();
   }
 
@@ -89,21 +90,7 @@ class _OnboardingState extends State<Onboarding> {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  SelectionItem(item: _route != null ? _route.routeName : null),
-                  SelectionItem(item: _stop != null ? _stop.stopName : null),
-                  // SelectionItem(
-                  //   item: _direction ?? directionOfJourney(_direction),
-                  // ),
-                ],
-              ),
-            ],
-          ),
+          Text(_displayJourneyInformation()),
           Expanded(
             child: BlocBuilder<OnboardingBloc, OnboardingState>(
               builder: (context, state) {
@@ -113,21 +100,32 @@ class _OnboardingState extends State<Onboarding> {
 
                 if (state is RoutesLoaded) {
                   List<RouteModel> _filtered = state.routes
-                      .where((item) => item.routeType == 0)
+                      .where((item) =>
+                          item.routeType == 0 &&
+                          _searchValue != '' &&
+                          item.routeName.toLowerCase().startsWith(_searchValue))
                       .toList();
                   return OnboardingSelect(
+                    onboardingTextController: onboardingTextController,
                     list: _filtered,
                     selectFunc: _selectRoute,
-                    selection: _route,
+                    nextPage: _nextPage,
                     mode: 'routes',
                   );
                 }
 
                 if (state is StopsLoaded) {
+                  List<StopModel> _filtered = state.stops
+                      .where((item) =>
+                          item.routeType == 0 &&
+                          _searchValue != '' &&
+                          item.stopName.toLowerCase().contains(_searchValue))
+                      .toList();
                   return OnboardingSelect(
-                    list: state.stops,
+                    onboardingTextController: onboardingTextController,
+                    list: _filtered,
                     selectFunc: _selectStop,
-                    selection: _stop,
+                    nextPage: _nextPage,
                     mode: 'stops',
                   );
                 }
@@ -158,65 +156,75 @@ class _OnboardingState extends State<Onboarding> {
   }
 }
 
-class SelectionItem extends StatelessWidget {
-  const SelectionItem({
-    dynamic key,
-    @required String item,
-  })  : _item = item,
-        super(key: key);
-
-  final String _item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: _item != null ? 1.0 : 0.5,
-      child: Text(
-        _item != null ? _item : null,
-      ),
-    );
-  }
-}
-
 class OnboardingSelect extends StatelessWidget {
-  const OnboardingSelect(
-      {Key key,
-      @required List list,
-      @required Function selectFunc,
-      @required String mode,
-      @required dynamic selection})
-      : _list = list,
+  const OnboardingSelect({
+    Key key,
+    @required this.onboardingTextController,
+    @required List list,
+    @required Function selectFunc,
+    @required Function nextPage,
+    @required String mode,
+  })  : _list = list,
         _selectFunc = selectFunc,
+        _nextPage = nextPage,
         _mode = mode,
-        _selection = selection,
         super(key: key);
 
+  final TextEditingController onboardingTextController;
   final List _list;
   final Function _selectFunc;
+  final Function _nextPage;
   final String _mode;
-  final dynamic _selection;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ListView.builder(
-        itemCount: _list.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () => _selectFunc(_list[index]),
-              child: Text(
-                _mode == 'routes'
-                    ? _list[index].routeName
-                    : _list[index].stopName,
-                style: TextStyle(
-                  color: _selection == _list[index] ? Colors.red : Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              TextField(
+                controller: onboardingTextController,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(10.0),
+                  border: InputBorder.none,
+                  hintText: 'Enter a search term',
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  _list.length > 0
+                      ? _mode == 'routes'
+                          ? _list[0].routeName
+                          : _list[0].stopName
+                      : '',
+                ),
+              ),
+            ],
+          ),
+          Flexible(
+            child: ListView.builder(
+              itemCount: _list.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () => _selectFunc(_list[index]),
+                    child: Text(
+                      _mode == 'routes'
+                          ? _list[index].routeName
+                          : _list[index].stopName,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
