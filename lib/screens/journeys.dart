@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 
 import '../models/models.dart';
 import '../blocs/blocs.dart';
-import 'onboarding.dart';
+import 'onboarding/onboarding.dart';
 
 class Journeys extends StatefulWidget {
   Journeys({Key key}) : super(key: key);
+
+  static const String routeName = '/Journeys';
 
   @override
   _JourneysState createState() => _JourneysState();
@@ -58,9 +60,6 @@ class _JourneysState extends State<Journeys> with TickerProviderStateMixin {
                   color: Colors.white,
                   iconSize: 50.0,
                   icon: Icon(Icons.add),
-                  // onPressed: () {
-                  //   print('TAP');
-                  // },
                   onPressed: () {
                     Navigator.pushNamed(context, Onboarding.routeName);
                   },
@@ -85,51 +84,71 @@ class _JourneysState extends State<Journeys> with TickerProviderStateMixin {
                     ));
                   }
                   if (state is JourneysLoadedWithDepartures) {
-                    return PageView.builder(
-                      itemCount: state.completeRequests.length,
-                      itemBuilder: (context, index) {
-                        final obj = state.completeRequests[index];
-                        return Container(
-                          color: colors[index],
-                          padding: EdgeInsets.all(12.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(
-                                    obj.journey.journeyName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 32.0,
+                    if (state.completeRequests.length == 0) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text('No Journeys yet. Add Button'),
+                            IconButton(
+                              color: Colors.white,
+                              iconSize: 100.0,
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, Onboarding.routeName);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return PageView.builder(
+                        itemCount: state.completeRequests.length,
+                        itemBuilder: (context, index) {
+                          final obj = state.completeRequests[index];
+                          return Container(
+                            color: colors[index],
+                            padding: EdgeInsets.all(12.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: <Widget>[
+                                    Text(
+                                      obj.journey.journeyName,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 32.0,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '${obj.journey.stopName}',
-                                    style: TextStyle(
-                                      fontSize: 28.0,
+                                    Text(
+                                      '${obj.journey.stopName}',
+                                      style: TextStyle(
+                                        fontSize: 28.0,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    directionOfJourney(obj.journey.direction),
-                                    style: TextStyle(
-                                      fontSize: 28.0,
+                                    Text(
+                                      directionOfJourney(obj.journey.direction),
+                                      style: TextStyle(
+                                        fontSize: 28.0,
+                                      ),
                                     ),
-                                  ),
-                                  DepartureTime(
-                                    departures: obj.departures,
-                                  ),
-                                  Text(obj.status.description),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                                    DepartureTime(
+                                      departures: obj.departures,
+                                    ),
+                                    Text(obj.status.description),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
                   }
                   return Container();
                 },

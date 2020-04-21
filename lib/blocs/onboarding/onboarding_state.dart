@@ -14,6 +14,18 @@ class OnboardingLoading extends OnboardingState {}
 
 class OnboardingError extends OnboardingState {}
 
+class OnboardingPageNumber extends OnboardingState {}
+
+class OnboardingNewJourney extends OnboardingState {
+  final RouteModel selectedRoute;
+  final StopModel selectedStop;
+
+  const OnboardingNewJourney({this.selectedRoute, this.selectedStop});
+
+  @override
+  List<Object> get props => [selectedRoute, selectedStop];
+}
+
 // Main Class
 class Journey extends OnboardingState {
   final RouteModel route;
@@ -33,6 +45,7 @@ class RoutesLoaded extends OnboardingState {
   @override
   List<Object> get props => [routes];
 }
+// Routes with Selection
 
 // Stops State
 class StopsLoaded extends OnboardingState {
@@ -43,6 +56,7 @@ class StopsLoaded extends OnboardingState {
   @override
   List<Object> get props => [stops];
 }
+// Stops with selection
 
 class DirectionSelect extends OnboardingState {
   @override

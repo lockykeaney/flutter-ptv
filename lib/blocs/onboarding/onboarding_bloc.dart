@@ -19,13 +19,19 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   OnboardingState get initialState => OnboardingInitial();
 
   @override
-  Stream<OnboardingState> mapEventToState(
-    OnboardingEvent event,
-  ) async* {
+  Stream<OnboardingState> mapEventToState(OnboardingEvent event) async* {
+    // get methods (API)
+    if (event is OnboardingStatus) {
+      yield OnboardingLoading();
+      try {
+        yield OnboardingNewJourney();
+      } catch (_) {
+        yield OnboardingError();
+      }
+    }
     if (event is FetchRoutes) {
       yield OnboardingLoading();
       try {
-        print("fetch routes event");
         final List<RouteModel> routes = await ptvRepository.fetchRoutes();
         yield RoutesLoaded(routes: routes);
       } catch (_) {
@@ -35,10 +41,21 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (event is FetchStops) {
       yield OnboardingLoading();
       try {
-        print("fetch stops event");
         final List<StopModel> stops =
             await ptvRepository.fetchStopsOnRoute(event.routeId);
         yield StopsLoaded(stops: stops);
+      } catch (_) {
+        yield OnboardingError();
+      }
+    }
+
+    // set methods (state)
+    if (event is SelectRoute) {
+      try {
+        // print(event.selectedRoute.routeName);
+        OnboardingNewJourney(selectedRoute: event.selectedRoute);
+        final List<RouteModel> routes = await ptvRepository.fetchRoutes();
+        yield RoutesLoaded(routes: routes);
       } catch (_) {
         yield OnboardingError();
       }

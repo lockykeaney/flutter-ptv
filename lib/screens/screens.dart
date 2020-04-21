@@ -1,3 +1,3 @@
 // export 'homepage.dart';
-export 'onboarding.dart';
+export 'onboarding/onboarding.dart';
 export 'journeys.dart';
